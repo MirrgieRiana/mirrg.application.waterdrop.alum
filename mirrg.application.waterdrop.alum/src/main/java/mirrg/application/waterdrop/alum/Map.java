@@ -379,7 +379,7 @@ public class Map
 			setLevel(x, y, getLevel(x, y) - 0.001);
 			setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) + 0.001);
 
-			double d = (length2 - length1) * 1000 * -0.1;
+			double d = (length2 - length1) * 1000 * -1;
 			setVelocity(x, y, getVelocity(x, y) + d);
 			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
 		}
@@ -400,25 +400,25 @@ public class Map
 			a += getLevel(x + xi, y + yi) - getLevel(x, y);
 			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
 
-			double d = a * 5;
+			double d = a * 1;
 			setVelocity(x, y, getVelocity(x, y) + d);
 			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
 		}
+		/*
+				// gravity
+				{
+					double a = 0;
+					a += getLevel(x + xi, y + yi) - getLevel(x, y);
+					a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
 
-		// gravity
-		{
-			double a = 0;
-			a += getLevel(x + xi, y + yi) - getLevel(x, y);
-			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
-
-			double d = a * 0.1;
-			if (d > getWeight(x, y)) d = getWeight(x, y);
-			if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
-			setWeight(x, y, getWeight(x, y) - d);
-			setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) + d);
-			validate(x, y);
-		}
-
+					double d = a * -0.01;
+					if (d > getLevel(x, y)) d = getLevel(x, y);
+					if (-d > getLevel(x + xi, y + yi)) d = -getLevel(x + xi, y + yi);
+					setLevel(x, y, getLevel(x, y) - d);
+					setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) + d);
+					validate(x, y);
+				}
+		*/
 		// 密度の低いほうに質量が移動する
 		a:
 		{
