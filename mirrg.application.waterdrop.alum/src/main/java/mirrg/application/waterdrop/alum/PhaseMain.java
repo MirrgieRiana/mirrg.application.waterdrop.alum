@@ -128,15 +128,14 @@ public class PhaseMain extends PhaseBase
 						{
 							for (int x = 0; x < map.getWidth(); x++) {
 								for (int y = 0; y < map.getHeight(); y++) {
-									double density = map.getWeight(x, y) / map.getLevel(x, y);
-									glColor3f((float) ((density - 1) / 10), 0.0f, (float) (1 - density));
+									glColor3f(0.0f, 0.0f, 0.0f);
 									if (x != map.getWidth() - 1) {
-										glVertex3f(x, (float) map.getLevel(x, y) + 0.05f, y);
-										glVertex3f(x + 1, (float) map.getLevel(x + 1, y) + 0.05f, y);
+										glVertex3f(x, (float) map.getV(x, y) + 0.05f, y);
+										glVertex3f(x + 1, (float) map.getV(x + 1, y) + 0.05f, y);
 									}
 									if (y != map.getHeight() - 1) {
-										glVertex3f(x, (float) map.getLevel(x, y) + 0.05f, y);
-										glVertex3f(x, (float) map.getLevel(x, y + 1) + 0.05f, y + 1);
+										glVertex3f(x, (float) map.getV(x, y) + 0.05f, y);
+										glVertex3f(x, (float) map.getV(x, y + 1) + 0.05f, y + 1);
 									}
 								}
 							}
@@ -150,21 +149,21 @@ public class PhaseMain extends PhaseBase
 							for (int y = 0; y < map.getHeight() - 1; y++) {
 								float c;
 
-								c = (float) fold(map.getWeight(x, y) / 100) * 0.8f + 0.2f;
+								c = (float) fold(map.getV(x, y) / 100) * 0.8f + 0.2f;
 								glColor3f(c, c, c);
-								glVertex3f(x, (float) map.getLevel(x, y), y);
+								glVertex3f(x, (float) map.getV(x, y), y);
 
-								c = (float) fold(map.getWeight(x + 1, y) / 100) * 0.8f + 0.2f;
+								c = (float) fold(map.getV(x + 1, y) / 100) * 0.8f + 0.2f;
 								glColor3f(c, c, c);
-								glVertex3f(x + 1, (float) map.getLevel(x + 1, y), y);
+								glVertex3f(x + 1, (float) map.getV(x + 1, y), y);
 
-								c = (float) fold(map.getWeight(x + 1, y + 1) / 100) * 0.8f + 0.2f;
+								c = (float) fold(map.getV(x + 1, y + 1) / 100) * 0.8f + 0.2f;
 								glColor3f(c, c, c);
-								glVertex3f(x + 1, (float) map.getLevel(x + 1, y + 1), y + 1);
+								glVertex3f(x + 1, (float) map.getV(x + 1, y + 1), y + 1);
 
-								c = (float) fold(map.getWeight(x, y + 1) / 100) * 0.8f + 0.2f;
+								c = (float) fold(map.getV(x, y + 1) / 100) * 0.8f + 0.2f;
 								glColor3f(c, c, c);
-								glVertex3f(x, (float) map.getLevel(x, y + 1), y + 1);
+								glVertex3f(x, (float) map.getV(x, y + 1), y + 1);
 
 							}
 						}

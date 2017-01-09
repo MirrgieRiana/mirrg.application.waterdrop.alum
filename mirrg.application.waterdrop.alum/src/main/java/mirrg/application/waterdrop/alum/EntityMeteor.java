@@ -110,7 +110,7 @@ public class EntityMeteor implements IEntity
 			int x2 = (int) Math.round((intersection.getX() + 1000) / 20);
 			int y2 = (int) Math.round((intersection.getZ() + 1000) / 20);
 
-			phaseMain.map.setWeight(x2, y2, phaseMain.map.getWeight(x2, y2) + power);
+			phaseMain.map.setV(x2, y2, phaseMain.map.getV(x2, y2) + power);
 
 			return false;
 		}
