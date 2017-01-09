@@ -106,11 +106,15 @@ public class EntityMeteor implements IEntity
 				point,
 				new Vector3D(x + dx * 10000, y + dy * 10000, z + dz * 10000), 1e-5));
 
+		if (intersection == null) return false;
+
 		if (intersection.distance(point) < 50) {
 			int x2 = (int) Math.round((intersection.getX() + 1000) / 20);
 			int y2 = (int) Math.round((intersection.getZ() + 1000) / 20);
 
-			phaseMain.map.setWeight(x2, y2, phaseMain.map.getWeight(x2, y2) + power);
+			double weight = phaseMain.map.getWeight(x2, y2) + power;
+			if (weight < 0) weight = 0;
+			phaseMain.map.setWeight(x2, y2, weight);
 
 			return false;
 		}

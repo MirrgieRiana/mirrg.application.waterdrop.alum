@@ -108,6 +108,8 @@ public class Map
 
 	public void setLevel(int x, int y, double value)
 	{
+		if (!Double.isFinite(value)) throw new IllegalArgumentException("" + value);
+		if (value < 0) throw new IllegalArgumentException("" + value);
 		if (x < 0) return;
 		if (y < 0) return;
 		if (x >= width) return;
@@ -117,6 +119,8 @@ public class Map
 
 	public void setWeight(int x, int y, double value)
 	{
+		if (!Double.isFinite(value)) throw new IllegalArgumentException("" + value);
+		if (value < 0) throw new IllegalArgumentException("" + value);
 		if (x < 0) return;
 		if (y < 0) return;
 		if (x >= width) return;
@@ -126,6 +130,7 @@ public class Map
 
 	public void setVelocity(int x, int y, double value)
 	{
+		if (!Double.isFinite(value)) throw new IllegalArgumentException("" + value);
 		if (x < 0) return;
 		if (y < 0) return;
 		if (x >= width) return;
@@ -144,7 +149,7 @@ public class Map
 	{
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				setWeight(x, y, Math.random());
+				setWeight(x, y, Math.random() + 0.5);
 				setLevel(x, y, 1);
 				setVelocity(x, y, 0);
 			}
@@ -153,8 +158,137 @@ public class Map
 
 	private double[] weight2;
 
+	// 運動エネルギー = w v^2
+	// 密度エネルギー = w log(|l|) - l
+	// 位置エネルギー = w g l
 	public void move()
 	{
+
+		validate();
+
+		// run
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+
+				if (getWeight(x, y) != 0) {
+
+					// 密度から速度に
+					// v' = v + c1(d - 1)
+					{
+						double l = getLevel(x, y);
+						double w = getWeight(x, y);
+						double d = w / l;
+						double f = d - 1;
+
+						setVelocity(x, y, getVelocity(x, y) + f);
+					}
+
+					// 収縮
+					{
+						double l = getLevel(x, y);
+						double w = getWeight(x, y);
+						double d = w / l;
+						if (d < 1) {
+							double f = (l - d) * -0.5;
+
+							setVelocity(x, y, getVelocity(x, y) + f);
+						}
+					}
+
+					// 速度から位置に
+					// l' = l + v
+					{
+						double v1 = getVelocity(x, y);
+						double l1 = getLevel(x, y);
+						double w = getWeight(x, y);
+
+						double l2 = l1 + 0.01 * v1;
+
+						if (l2 == 0) {
+							setLevel(x, y, 0.001);
+							setVelocity(x, y, -v1);
+						} else if (l2 < 0) {
+							setLevel(x, y, -l2);
+							setVelocity(x, y, -v1);
+						} else {
+							double A = w * FastMath.log(l1) - l1;
+							double B = w * FastMath.log(l2) - l2;
+							double v2 = FastMath.sqrt((B - A) / w + v1 * v1);
+							if (Double.isNaN(v2)) v2 = 0;
+
+							setLevel(x, y, l2);
+							setVelocity(x, y, v2);
+						}
+					}
+
+					// 抵抗
+					{
+						double v = getVelocity(x, y);
+						setVelocity(x, y, v * 0.95);
+					}
+
+					// 乾く
+					{
+						if (getWeight(x, y) < 0.00001) setWeight(x, y, 0);
+					}
+
+				} else {
+
+					// 濡れる
+					a:
+					{
+						int xi;
+						int yi;
+						{
+							xi = -1;
+							yi = 0;
+							if (getWeight(x + xi, y + yi) > 2) {
+								setWeight(x, y, getWeight(x + xi, y + yi) / 2);
+								setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) / 2);
+								setLevel(x, y, getLevel(x + xi, y + yi) / 2);
+								setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) / 2);
+								break a;
+							}
+						}
+						{
+							xi = 1;
+							yi = 0;
+							if (getWeight(x + xi, y + yi) > 2) {
+								setWeight(x, y, getWeight(x + xi, y + yi) / 2);
+								setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) / 2);
+								setLevel(x, y, getLevel(x + xi, y + yi) / 2);
+								setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) / 2);
+								break a;
+							}
+						}
+						{
+							xi = 0;
+							yi = -1;
+							if (getWeight(x + xi, y + yi) > 2) {
+								setWeight(x, y, getWeight(x + xi, y + yi) / 2);
+								setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) / 2);
+								setLevel(x, y, getLevel(x + xi, y + yi) / 2);
+								setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) / 2);
+								break a;
+							}
+						}
+						{
+							xi = 0;
+							yi = 1;
+							if (getWeight(x + xi, y + yi) > 2) {
+								setWeight(x, y, getWeight(x + xi, y + yi) / 2);
+								setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) / 2);
+								setLevel(x, y, getLevel(x + xi, y + yi) / 2);
+								setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) / 2);
+								break a;
+							}
+						}
+					}
+
+				}
+
+			}
+		}
 
 		validate();
 
@@ -165,37 +299,33 @@ public class Map
 
 		validate();
 
-		// run
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				setLevel(x, y, getLevel(x, y) + getVelocity(x, y));
-			}
-		}
-
-		// friction
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				setVelocity(x, y, getVelocity(x, y) * 0.95);
-			}
-		}
-
-		validate();
-
 	}
 
 	private void validate()
 	{
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (getWeight(x, y) <= 0) {
+				if (getWeight(x, y) == 0) {
 					setLevel(x, y, 0);
 					setWeight(x, y, 0);
 					setVelocity(x, y, 0);
-				} else if (getLevel(x, y) <= 0) {
-					setLevel(x, y, 0.0001);
+				} else if (getLevel(x, y) == 0) {
+					setLevel(x, y, 0.001);
 					setVelocity(x, y, 0);
 				}
 			}
+		}
+	}
+
+	private void validate(int x, int y)
+	{
+		if (getWeight(x, y) == 0) {
+			setLevel(x, y, 0);
+			setWeight(x, y, 0);
+			setVelocity(x, y, 0);
+		} else if (getLevel(x, y) == 0) {
+			setLevel(x, y, 0.001);
+			setVelocity(x, y, 0);
 		}
 	}
 
@@ -212,12 +342,12 @@ public class Map
 				yi = 0;
 				break;
 			case 1:
-				xi = 0;
-				yi = -1;
-				break;
-			case 2:
 				xi = 1;
 				yi = 0;
+				break;
+			case 2:
+				xi = 0;
+				yi = -1;
 				break;
 			case 3:
 				xi = 0;
@@ -228,15 +358,15 @@ public class Map
 		}
 
 		if (getWeight(x, y) == 0) return;
+		/*
+				// density
+				{
+					double a = getWeight(x, y) / getLevel(x, y) - 1;
 
-		// density
-		{
-			double a = Math.min(getWeight(x, y) / getLevel(x, y), 100) - 1;
-
-			double delta = a * 0.0001;
-			setVelocity(x, y, getVelocity(x, y) + delta);
-		}
-
+					double delta = a * -0.1;
+					setVelocity(x, y, getVelocity(x, y) - delta);
+				}
+		*/
 		if (getWeight(x + xi, y + yi) == 0) return;
 
 		// area
@@ -249,9 +379,9 @@ public class Map
 			setLevel(x, y, getLevel(x, y) - 0.001);
 			setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) + 0.001);
 
-			double delta = (length2 - length1) * 1000 * -0.001;
-			setVelocity(x, y, getVelocity(x, y) + delta);
-			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - delta);
+			double d = (length2 - length1) * 1000 * -0.1;
+			setVelocity(x, y, getVelocity(x, y) + d);
+			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
 		}
 		/*
 						// weight
@@ -263,21 +393,40 @@ public class Map
 							setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - delta);
 						}
 				*/
+
 		// gravity
 		{
 			double a = 0;
 			a += getLevel(x + xi, y + yi) - getLevel(x, y);
 			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
 
-			double d = a * -5;
+			double d = a * 5;
+			setVelocity(x, y, getVelocity(x, y) + d);
+			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
+		}
+
+		// gravity
+		{
+			double a = 0;
+			a += getLevel(x + xi, y + yi) - getLevel(x, y);
+			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
+
+			double d = a * 0.1;
 			if (d > getWeight(x, y)) d = getWeight(x, y);
 			if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
 			setWeight(x, y, getWeight(x, y) - d);
 			setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) + d);
+			validate(x, y);
 		}
 
-		// weight adjust
+		// 密度の低いほうに質量が移動する
+		a:
 		{
+			if (x + xi < 0) break a;
+			if (y + yi < 0) break a;
+			if (x + xi > width) break a;
+			if (y + yi > height) break a;
+
 			double l1 = getLevel(x, y);
 			double l2 = getLevel(x + xi, y + yi);
 			if (l1 > 0 && l2 > 0) {
@@ -285,9 +434,12 @@ public class Map
 				double w2 = getWeight(x + xi, y + yi);
 				double move = w1 - (w1 + w2) * l1 / (l1 + l2);
 
-				double d = move * 0.2;
+				double d = move * 0.5;
+				if (d > getWeight(x, y)) d = getWeight(x, y);
+				if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
 				setWeight(x, y, getWeight(x, y) - d);
 				setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) + d);
+				validate(x, y);
 			}
 		}
 
