@@ -1,11 +1,11 @@
-package mirrg.application.waterdrop.alum2;
+package mirrg.application.waterdrop.alum;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class EntityMeteorLevel extends EntityMeteorBoard
+public class EntityMeteorVelocity extends EntityMeteorBoard
 {
 
-	public EntityMeteorLevel(PhaseMain phaseMain, double x, double y, double z, double dx, double dy, double dz, double power, int range)
+	public EntityMeteorVelocity(PhaseMain phaseMain, double x, double y, double z, double dx, double dy, double dz, double power, int range)
 	{
 		super(phaseMain, x, y, z, dx, dy, dz, power, range);
 	}
@@ -13,7 +13,7 @@ public class EntityMeteorLevel extends EntityMeteorBoard
 	@Override
 	protected void getColor()
 	{
-		glColor3f(1, 0, 0);
+		glColor3f(0, 0, 1);
 	}
 
 	@Override

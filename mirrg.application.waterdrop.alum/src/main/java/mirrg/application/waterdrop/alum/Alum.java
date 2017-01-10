@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum2;
+package mirrg.application.waterdrop.alum;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;

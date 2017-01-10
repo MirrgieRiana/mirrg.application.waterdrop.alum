@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum2;
+package mirrg.application.waterdrop.alum;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
@@ -25,11 +25,7 @@ public class PhaseMain extends PhaseBase
 	double cameraH;
 	double cameraV;
 
-<<<<<<< HEAD:mirrg.application.waterdrop.alum/src/main/java/mirrg/application/waterdrop/alum/PhaseMain.java
-	Map1 map;
-=======
-	Map2 map;
->>>>>>> origin/master:mirrg.application.waterdrop.alum/src/main/java/mirrg/application/waterdrop/alum2/PhaseMain.java
+	public Map2 map;
 
 	private boolean enableGrid = true;
 	private boolean enableWire = true;
@@ -38,11 +34,7 @@ public class PhaseMain extends PhaseBase
 
 	public PhaseMain()
 	{
-<<<<<<< HEAD:mirrg.application.waterdrop.alum/src/main/java/mirrg/application/waterdrop/alum/PhaseMain.java
-		map = new Map1(100, 100);
-=======
 		map = new Map2(100, 100);
->>>>>>> origin/master:mirrg.application.waterdrop.alum/src/main/java/mirrg/application/waterdrop/alum2/PhaseMain.java
 		map.randomize();
 
 		resetView();

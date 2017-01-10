@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum2;
+package mirrg.application.waterdrop.alum;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
