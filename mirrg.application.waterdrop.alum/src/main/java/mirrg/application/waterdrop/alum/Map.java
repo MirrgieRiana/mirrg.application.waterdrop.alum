@@ -221,6 +221,18 @@ public class Map
 						}
 					}
 
+					// 面積最小
+					{
+						double length1 = calculateNeighbourLineLength(x, y);
+
+						setLevel(x, y, getLevel(x, y) + 0.001);
+						double length2 = calculateNeighbourLineLength(x, y);
+						setLevel(x, y, getLevel(x, y) - 0.001);
+
+						double d = (length2 - length1) * 1000 * -1;
+						setVelocity(x, y, getVelocity(x, y) + d);
+					}
+
 					// 抵抗
 					{
 						double v = getVelocity(x, y);
@@ -369,20 +381,6 @@ public class Map
 		*/
 		if (getWeight(x + xi, y + yi) == 0) return;
 
-		// area
-		{
-			double length1 = calculateNeighbourLineLength(x, y, xi, yi);
-
-			setLevel(x, y, getLevel(x, y) + 0.001);
-			setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) - 0.001);
-			double length2 = calculateNeighbourLineLength(x, y, xi, yi);
-			setLevel(x, y, getLevel(x, y) - 0.001);
-			setLevel(x + xi, y + yi, getLevel(x + xi, y + yi) + 0.001);
-
-			double d = (length2 - length1) * 1000 * -1;
-			setVelocity(x, y, getVelocity(x, y) + d);
-			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
-		}
 		/*
 						// weight
 						{
@@ -393,18 +391,18 @@ public class Map
 							setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - delta);
 						}
 				*/
-
-		// gravity
-		{
-			double a = 0;
-			a += getLevel(x + xi, y + yi) - getLevel(x, y);
-			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
-
-			double d = a * 1;
-			setVelocity(x, y, getVelocity(x, y) + d);
-			setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
-		}
 		/*
+				// gravity
+				{
+					double a = 0;
+					a += getLevel(x + xi, y + yi) - getLevel(x, y);
+					a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
+
+					double d = a * 1;
+					setVelocity(x, y, getVelocity(x, y) + d);
+					setVelocity(x + xi, y + yi, getVelocity(x + xi, y + yi) - d);
+				}
+
 				// gravity
 				{
 					double a = 0;
@@ -419,22 +417,42 @@ public class Map
 					validate(x, y);
 				}
 		*/
+		// gravity
+		a:
+		{
+			if (x + xi < 0) break a;
+			if (y + yi < 0) break a;
+			if (x + xi >= width) break a;
+			if (y + yi >= height) break a;
+
+			double a = 0;
+			a += getLevel(x + xi, y + yi) - getLevel(x, y);
+			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
+
+			double d = a * -0.1;
+			if (d > getWeight(x, y)) d = getWeight(x, y);
+			if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
+			setWeight(x, y, getWeight(x, y) - d);
+			setWeight(x + xi, y + yi, getWeight(x + xi, y + yi) + d);
+			validate(x, y);
+		}
+
 		// 密度の低いほうに質量が移動する
 		a:
 		{
 			if (x + xi < 0) break a;
 			if (y + yi < 0) break a;
-			if (x + xi > width) break a;
-			if (y + yi > height) break a;
+			if (x + xi >= width) break a;
+			if (y + yi >= height) break a;
 
 			double l1 = getLevel(x, y);
 			double l2 = getLevel(x + xi, y + yi);
 			if (l1 > 0 && l2 > 0) {
 				double w1 = getWeight(x, y);
 				double w2 = getWeight(x + xi, y + yi);
-				double move = w1 - (w1 + w2) * l1 / (l1 + l2);
+				double move = l1 * (w1 + w2) / (l1 + l2) - w1;
 
-				double d = move * 0.5;
+				double d = move * -0.5;
 				if (d > getWeight(x, y)) d = getWeight(x, y);
 				if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
 				setWeight(x, y, getWeight(x, y) - d);
@@ -445,7 +463,7 @@ public class Map
 
 	}
 
-	private double calculateNeighbourLineLength(int x, int y, int xx, int yy)
+	private double calculateNeighbourLineLength(int x, int y)
 	{
 		double l = 0;
 		{
@@ -459,24 +477,6 @@ public class Map
 			l += FastMath.sqrt(1 + b1 * b1);
 			l += FastMath.sqrt(1 + c1 * c1);
 			l += FastMath.sqrt(1 + d1 * d1);
-		}
-		{
-			double o = getLevel(x + xx, y + yy);
-			double a1 = getLevel(x + xx - 1, y + yy) - o;
-			double b1 = getLevel(x + xx, y + yy - 1) - o;
-			double c1 = getLevel(x + xx + 1, y + yy) - o;
-			double d1 = getLevel(x + xx, y + yy + 1) - o;
-
-			l += FastMath.sqrt(1 + a1 * a1);
-			l += FastMath.sqrt(1 + b1 * b1);
-			l += FastMath.sqrt(1 + c1 * c1);
-			l += FastMath.sqrt(1 + d1 * d1);
-		}
-		{
-			double o = getLevel(x, y);
-			double a1 = getLevel(x + xx, y + yy) - o;
-
-			l -= FastMath.sqrt(1 + a1 * a1);
 		}
 		return l;
 	}
