@@ -213,7 +213,7 @@ public class Map
 						} else {
 							double A = w * FastMath.log(l1) - l1;
 							double B = w * FastMath.log(l2) - l2;
-							double v2 = FastMath.sqrt((B - A) / w + v1 * v1);
+							double v2 = FastMath.sqrt((A - B) / w + v1 * v1);
 							if (Double.isNaN(v2)) v2 = 0;
 
 							setLevel(x, y, l2);
