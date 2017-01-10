@@ -25,7 +25,7 @@ public class PhaseMain extends PhaseBase
 	double cameraH;
 	double cameraV;
 
-	Map map;
+	Map1 map;
 
 	private boolean showGrid = true;
 	private boolean showWire = true;
@@ -33,7 +33,7 @@ public class PhaseMain extends PhaseBase
 
 	public PhaseMain()
 	{
-		map = new Map(100, 100);
+		map = new Map1(100, 100);
 		map.randomize();
 
 		resetView();
