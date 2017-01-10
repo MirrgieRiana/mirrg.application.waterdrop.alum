@@ -3,12 +3,10 @@ package mirrg.application.waterdrop.alum;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 
-import java.awt.AWTException;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,48 +32,15 @@ import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import mirrg.application.waterdrop.alum.core.IPhase;
+import mirrg.application.waterdrop.alum.g.PhaseMain;
 import mirrg.helium.swing.nitrogen.util.HSwing;
 import mirrg.helium.swing.nitrogen.wrapper.artifacts.logging.HLog;
 
 public class Alum
 {
 
-	public static Robot ROBOT;
-	static {
-		try {
-			ROBOT = new Robot();
-		} catch (AWTException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Point getMouseLocation()
-	{
-		return MouseInfo.getPointerInfo().getLocation();
-	}
-
 	public static Cursor cursorDefault;
-
-	public static void setCursor(Cursor cursor)
-	{
-		try {
-			Mouse.setNativeCursor(cursor);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static int getWidth()
-	{
-		return canvas.getWidth();
-	}
-
-	public static int getHeight()
-	{
-		return canvas.getHeight();
-	}
-
 	public static JFrame frame;
 	public static Canvas canvas;
 
@@ -154,17 +119,6 @@ public class Alum
 			cursorDefault = Mouse.getNativeCursor();
 		}
 
-		/*
-		try {
-			Display.setDisplayMode(new DisplayMode(width, height));
-			Display.setTitle("Alum");
-			Display.create();
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-			return;
-		}
-		*/
-
 		try {
 
 			// init
@@ -194,6 +148,25 @@ public class Alum
 			Display.destroy();
 		}
 
+	}
+
+	public static void setCursor(Cursor cursor)
+	{
+		try {
+			Mouse.setNativeCursor(cursor);
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static int getWidth()
+	{
+		return canvas.getWidth();
+	}
+
+	public static int getHeight()
+	{
+		return canvas.getHeight();
 	}
 
 	public static void doScreenShot()
@@ -264,6 +237,8 @@ public class Alum
 		glLoadIdentity();
 	}
 
+	//
+
 	public static double getArea(Vector3D a, Vector3D b, Vector3D c)
 	{
 		ArrayList<Vector3D> points = new ArrayList<>();
@@ -273,6 +248,11 @@ public class Alum
 		ArrayList<int[]> facets = new ArrayList<>();
 		PolyhedronsSet polyhedronsSet = new PolyhedronsSet(points, facets, 1e-5);
 		return polyhedronsSet.getBoundarySize();
+	}
+
+	public static Point getMouseLocation()
+	{
+		return MouseInfo.getPointerInfo().getLocation();
 	}
 
 }
