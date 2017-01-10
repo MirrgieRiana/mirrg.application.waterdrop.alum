@@ -199,6 +199,7 @@ public class Map1 implements IMap
 							double A = w * FastMath.log(l1) - l1;
 							double B = w * FastMath.log(l2) - l2;
 							double v2 = FastMath.sqrt((A - B) / w + v1 * v1);
+							if (v1 < 0) v2 = -v2;
 							if (Double.isNaN(v2)) v2 = 0;
 
 							setLevel(x, y, l2);
@@ -369,7 +370,7 @@ public class Map1 implements IMap
 			a += getLevel(x + xi, y + yi) - getLevel(x, y);
 			a += yi * FastMath.tan(boardAngle / 180 * Math.PI);
 
-			double d = a * -0.1;
+			double d = a * -0.2;
 			if (d > getWeight(x, y)) d = getWeight(x, y);
 			if (-d > getWeight(x + xi, y + yi)) d = -getWeight(x + xi, y + yi);
 			setWeight(x, y, getWeight(x, y) - d);
@@ -456,7 +457,7 @@ public class Map1 implements IMap
 			dest[1] = 0;
 			dest[2] = 0;
 		} else {
-			float c = (float) fold(getWeight(x, y) / 100) * 0.8f + 0.2f;
+			float c = (float) fold(getWeight(x, y) / 100) * 0.5f + 0.5f;
 			dest[0] = c;
 			dest[1] = c;
 			dest[2] = c;
