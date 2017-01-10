@@ -3,7 +3,7 @@ package mirrg.application.waterdrop.alum2;
 import org.apache.commons.math3.util.FastMath;
 import org.lwjgl.input.Keyboard;
 
-public class Map
+public class Map2
 {
 
 	private int width;
@@ -12,7 +12,7 @@ public class Map
 	private double[] velocity;
 	private double boardAngle = 0;
 
-	public Map(int width, int height)
+	public Map2(int width, int height)
 	{
 		this.width = width;
 		this.height = height;
