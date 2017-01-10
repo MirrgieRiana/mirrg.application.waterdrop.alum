@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum;
+package mirrg.application.waterdrop.alum2;
 
 public interface IEntity
 {

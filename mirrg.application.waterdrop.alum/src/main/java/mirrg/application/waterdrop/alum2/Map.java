@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum;
+package mirrg.application.waterdrop.alum2;
 
 import org.apache.commons.math3.util.FastMath;
 import org.lwjgl.input.Keyboard;

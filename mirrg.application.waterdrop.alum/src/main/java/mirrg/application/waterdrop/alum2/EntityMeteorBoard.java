@@ -1,4 +1,4 @@
-package mirrg.application.waterdrop.alum;
+package mirrg.application.waterdrop.alum2;
 
 public abstract class EntityMeteorBoard extends EntityMeteor
 {
