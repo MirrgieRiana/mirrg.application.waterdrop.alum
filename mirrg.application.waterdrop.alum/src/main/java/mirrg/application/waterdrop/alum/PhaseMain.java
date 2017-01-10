@@ -27,9 +27,10 @@ public class PhaseMain extends PhaseBase
 
 	Map map;
 
-	private boolean showGrid = true;
-	private boolean showWire = true;
-	private boolean showFloor = true;
+	private boolean enableGrid = true;
+	private boolean enableWire = true;
+	private boolean enableFloor = true;
+	private boolean enableSimulate = true;
 
 	public PhaseMain()
 	{
@@ -107,7 +108,7 @@ public class PhaseMain extends PhaseBase
 					glTranslated(-1000, 0, -1000);
 					glScaled(20, 20, 20);
 
-					if (showGrid) {
+					if (enableGrid) {
 						glColor3f(0.0f, 1.0f, 0.0f);
 						glBegin(GL_LINES);
 						{
@@ -123,16 +124,14 @@ public class PhaseMain extends PhaseBase
 						glEnd();
 					}
 
-					if (showWire) {
+					if (enableWire) {
 						glBegin(GL_LINES);
 						{
 							for (int x = 0; x < map.getWidth(); x++) {
 								for (int y = 0; y < map.getHeight(); y++) {
-									if (map.getWeight(x, y) == 0) {
-										glColor3f(0, 0, 0);
-									} else {
-										double density = map.getWeight(x, y) / map.getLevel(x, y);
-										glColor3f((float) ((density - 1) / 10), 0.0f, (float) (1 - density));
+									{
+										double value = map.getVelocity(x, y);
+										glColor3f((float) (value), 0.0f, (float) (-value));
 									}
 									if (x != map.getWidth() - 1) {
 										glVertex3f(x, (float) map.getLevel(x, y) + 0.05f, y);
@@ -148,40 +147,40 @@ public class PhaseMain extends PhaseBase
 						glEnd();
 					}
 
-					if (showFloor) {
+					if (enableFloor) {
 						glBegin(GL_QUADS);
 						for (int x = 0; x < map.getWidth() - 1; x++) {
 							for (int y = 0; y < map.getHeight() - 1; y++) {
 								float c;
 
-								if (map.getWeight(x, y) == 0) {
+								if (map.getLevel(x, y) == 0) {
 									c = 0;
 								} else {
-									c = (float) fold(map.getWeight(x, y) / 100) * 0.8f + 0.2f;
+									c = (float) fold(map.getLevel(x, y) / 1) * 0.8f + 0.2f;
 								}
 								glColor3f(c, c, c);
 								glVertex3f(x, (float) map.getLevel(x, y), y);
 
-								if (map.getWeight(x + 1, y) == 0) {
+								if (map.getLevel(x + 1, y) == 0) {
 									c = 0;
 								} else {
-									c = (float) fold(map.getWeight(x + 1, y) / 100) * 0.8f + 0.2f;
+									c = (float) fold(map.getLevel(x + 1, y) / 1) * 0.8f + 0.2f;
 								}
 								glColor3f(c, c, c);
 								glVertex3f(x + 1, (float) map.getLevel(x + 1, y), y);
 
-								if (map.getWeight(x + 1, y + 1) == 0) {
+								if (map.getLevel(x + 1, y + 1) == 0) {
 									c = 0;
 								} else {
-									c = (float) fold(map.getWeight(x + 1, y + 1) / 100) * 0.8f + 0.2f;
+									c = (float) fold(map.getLevel(x + 1, y + 1) / 1) * 0.8f + 0.2f;
 								}
 								glColor3f(c, c, c);
 								glVertex3f(x + 1, (float) map.getLevel(x + 1, y + 1), y + 1);
 
-								if (map.getWeight(x, y + 1) == 0) {
+								if (map.getLevel(x, y + 1) == 0) {
 									c = 0;
 								} else {
-									c = (float) fold(map.getWeight(x, y + 1) / 100) * 0.8f + 0.2f;
+									c = (float) fold(map.getLevel(x, y + 1) / 1) * 0.8f + 0.2f;
 								}
 								glColor3f(c, c, c);
 								glVertex3f(x, (float) map.getLevel(x, y + 1), y + 1);
@@ -277,9 +276,10 @@ public class PhaseMain extends PhaseBase
 		//if (Alum.getMouseLocation().x >= Alum.frame.getX() + Alum.frame.getWidth()) return new PhasePause(this);
 		//if (Alum.getMouseLocation().y >= Alum.frame.getY() + Alum.frame.getHeight()) return new PhasePause(this);
 
-		if (InputState.kb[Keyboard.KEY_F1] == 1) showGrid = !showGrid;
-		if (InputState.kb[Keyboard.KEY_F2] == 1) showWire = !showWire;
-		if (InputState.kb[Keyboard.KEY_F3] == 1) showFloor = !showFloor;
+		if (InputState.kb[Keyboard.KEY_F1] == 1) enableGrid = !enableGrid;
+		if (InputState.kb[Keyboard.KEY_F2] == 1) enableWire = !enableWire;
+		if (InputState.kb[Keyboard.KEY_F3] == 1) enableFloor = !enableFloor;
+		if (InputState.kb[Keyboard.KEY_F4] == 1) enableSimulate = !enableSimulate;
 
 		{
 			cameraH -= 0.5 * InputState.dx;
@@ -304,23 +304,32 @@ public class PhaseMain extends PhaseBase
 			double dz = 30 * Math.cos(cameraV / 180 * Math.PI) * Math.cos(cameraH / 180 * Math.PI);
 
 			if (InputState.mb[0] > 0 && (InputState.mb[0] - 1) % 20 == 0) {
-				addEntity(new EntityMeteor(this, x, y, z, dx, dy, dz, 100));
+				addEntity(new EntityMeteorVelocity(this, x, y, z, dx, dy, dz, 10, 0));
 			}
 			if (InputState.mb[1] > 0 && (InputState.mb[1] - 1) % 20 == 0) {
-				addEntity(new EntityMeteor(this, x, y, z, dx, dy, dz, -100));
+				addEntity(new EntityMeteorLevel(this, x, y, z, dx, dy, dz, 10, 0));
 			}
 			if (InputState.kb[Keyboard.KEY_1] > 0 && (InputState.kb[Keyboard.KEY_1] - 1) % 20 == 0) {
-				addEntity(new EntityMeteor(this, x, y, z, dx, dy, dz, 1000));
+				addEntity(new EntityMeteorVelocity(this, x, y, z, dx, dy, dz, 10, 3));
 			}
 			if (InputState.kb[Keyboard.KEY_2] > 0 && (InputState.kb[Keyboard.KEY_2] - 1) % 20 == 0) {
-				addEntity(new EntityMeteor(this, x, y, z, dx, dy, dz, 10000));
+				addEntity(new EntityMeteorVelocity(this, x, y, z, dx, dy, dz, 100, 5));
+			}
+			if (InputState.kb[Keyboard.KEY_3] > 0 && (InputState.kb[Keyboard.KEY_3] - 1) % 20 == 0) {
+				addEntity(new EntityMeteorVelocity(this, x, y, z, dx, dy, dz, 1000, 10));
+			}
+			if (InputState.kb[Keyboard.KEY_4] > 0 && (InputState.kb[Keyboard.KEY_4] - 1) % 20 == 0) {
+				addEntity(new EntityMeteorLevel(this, x, y, z, dx, dy, dz, 10, 3));
+			}
+			if (InputState.kb[Keyboard.KEY_5] > 0 && (InputState.kb[Keyboard.KEY_5] - 1) % 20 == 0) {
+				addEntity(new EntityMeteorLevel(this, x, y, z, dx, dy, dz, 100, 5));
+			}
+			if (InputState.kb[Keyboard.KEY_6] > 0 && (InputState.kb[Keyboard.KEY_6] - 1) % 20 == 0) {
+				addEntity(new EntityMeteorLevel(this, x, y, z, dx, dy, dz, 1000, 10));
 			}
 		}
-		if (InputState.mb[2] == 1) {
-			map.randomize();
-		}
+		if (InputState.mb[2] == 1) map.randomize();
 
-		//map.copy();
 		synchronized (this) {
 			Iterator<IEntity> i = entities.iterator();
 			while (i.hasNext()) {
@@ -328,9 +337,8 @@ public class PhaseMain extends PhaseBase
 				if (!entity.move()) i.remove();
 			}
 		}
-		//map.flip();
 
-		map.move();
+		if (enableSimulate) map.move();
 
 		return this;
 	}

@@ -6,19 +6,18 @@ import org.apache.commons.math3.geometry.euclidean.threed.Line;
 import org.apache.commons.math3.geometry.euclidean.threed.Plane;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-public class EntityMeteor implements IEntity
+public abstract class EntityMeteor implements IEntity
 {
 
-	private PhaseMain phaseMain;
-	private double x;
-	private double y;
-	private double z;
-	private double dx;
-	private double dy;
-	private double dz;
-	private double power;
+	protected PhaseMain phaseMain;
+	protected double x;
+	protected double y;
+	protected double z;
+	protected double dx;
+	protected double dy;
+	protected double dz;
 
-	public EntityMeteor(PhaseMain phaseMain, double x, double y, double z, double dx, double dy, double dz, double power)
+	public EntityMeteor(PhaseMain phaseMain, double x, double y, double z, double dx, double dy, double dz)
 	{
 		this.phaseMain = phaseMain;
 		this.x = x;
@@ -27,7 +26,6 @@ public class EntityMeteor implements IEntity
 		this.dx = dx;
 		this.dy = dy;
 		this.dz = dz;
-		this.power = power;
 
 		this.x += this.dx * 5;
 		this.y += this.dy * 5;
@@ -41,42 +39,38 @@ public class EntityMeteor implements IEntity
 		{
 			glTranslated(x, y, z);
 
-			glScaled(50, 50, 50);
+			glScaled(10, 10, 10);
 			glTranslated(-0.5, -0.5, -0.5);
 			glBegin(GL_QUADS);
 			{
 
-				glColor3f(1, 0, 0);
+				getColor();
+
 				glVertex3f(0, 0, 0);
 				glVertex3f(1, 0, 0);
 				glVertex3f(1, 0, 1);
 				glVertex3f(0, 0, 1);
 
-				glColor3f(0, 1, 0);
 				glVertex3f(0, 1, 0);
 				glVertex3f(1, 1, 0);
 				glVertex3f(1, 1, 1);
 				glVertex3f(0, 1, 1);
 
-				glColor3f(0, 0, 1);
 				glVertex3f(0, 0, 0);
 				glVertex3f(0, 1, 0);
 				glVertex3f(0, 1, 1);
 				glVertex3f(0, 0, 1);
 
-				glColor3f(0, 1, 1);
 				glVertex3f(1, 0, 0);
 				glVertex3f(1, 1, 0);
 				glVertex3f(1, 1, 1);
 				glVertex3f(1, 0, 1);
 
-				glColor3f(1, 0, 1);
 				glVertex3f(0, 0, 0);
 				glVertex3f(1, 0, 0);
 				glVertex3f(1, 1, 0);
 				glVertex3f(0, 1, 0);
 
-				glColor3f(1, 1, 0);
 				glVertex3f(0, 0, 1);
 				glVertex3f(1, 0, 1);
 				glVertex3f(1, 1, 1);
@@ -112,13 +106,19 @@ public class EntityMeteor implements IEntity
 			int x2 = (int) Math.round((intersection.getX() + 1000) / 20);
 			int y2 = (int) Math.round((intersection.getZ() + 1000) / 20);
 
-			double weight = phaseMain.map.getWeight(x2, y2) + power;
-			if (weight < 0) weight = 0;
-			phaseMain.map.setWeight(x2, y2, weight);
+			onCollide(x2, y2);
 
 			return false;
 		}
 
 		return true;
 	}
+
+	protected void getColor()
+	{
+		glColor3f(0, 0, 0);
+	}
+
+	protected abstract void onCollide(int x2, int y2);
+
 }
